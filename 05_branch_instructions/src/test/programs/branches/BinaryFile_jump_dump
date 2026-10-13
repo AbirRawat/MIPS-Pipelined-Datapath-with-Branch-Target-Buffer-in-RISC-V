@@ -1,0 +1,8 @@
+00700293 // ADDI x5, x0, 7       | x5 = 7
+010000ef // JAL  x1, +16        | call func (word5); link x1 = PC+4 = 8 (word2)
+01400313 // ADDI x6, x0, 20     | return target (link=8 lands here): x6 = 20
+01e00393 // ADDI x7, x0, 30     | x7 = 30
+00c0006f // JAL  x0, +12        | plain jump to end (word7); link discarded, x0 stays 0
+02800413 // ADDI x8, x0, 40     | func: x8 = 40
+00008067 // JALR x0, 0(x1)      | return to x1 = 8 (word2)
+00900493 // ADDI x9, x0, 9      | end marker

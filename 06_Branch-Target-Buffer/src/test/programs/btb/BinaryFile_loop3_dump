@@ -1,0 +1,6 @@
+00000113 // ADDI x2, x0, 0       | x2 = 0 (accumulator)
+00300093 // ADDI x1, x0, 3       | x1 = 3 (loop counter)
+00110113 // ADDI x2, x2, 1       | loop: x2 += 1
+fff08093 // ADDI x1, x1, -1      | x1 -= 1
+fe009ce3 // BNE  x1, x0, -8      | if x1 != 0 branch back to loop (offset -8)
+00010493 // ADDI x9, x2, 0       | done: x9 = x2 (must be 3)

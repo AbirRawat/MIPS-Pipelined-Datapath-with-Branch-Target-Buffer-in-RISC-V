@@ -1,0 +1,9 @@
+00500093 // ADDI x1, x0, 5       | x1 = 5
+00600113 // ADDI x2, x0, 6       | x2 = 6
+00002463 // .word (B funct3=010) | illegal branch -> NOP, EXCEPTION, no redirect
+00700193 // ADDI x3, x0, 7       | executes, exception clears (no latched trap)
+00003463 // .word (B funct3=011) | illegal branch -> NOP, EXCEPTION
+00800213 // ADDI x4, x0, 8       | executes, exception clears
+00001067 // .word (JALR f3=001)  | illegal JALR -> NOP, EXCEPTION, no redirect
+04000313 // ADDI x6, x0, 64      | x6 = 64 (0x40, aligned base for JALR)
+00230067 // JALR x0, 2(x6)       | target = 0x42 (bits[1:0]=10) -> MISALIGNED EXCEPTION (terminal: redirect not observed)

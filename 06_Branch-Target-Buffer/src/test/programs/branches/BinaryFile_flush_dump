@@ -1,0 +1,7 @@
+02a00413 // ADDI x8, x0, 42      | seed x8 = 42
+00500093 // ADDI x1, x0, 5       | x1 = 5
+00500113 // ADDI x2, x0, 5       | x2 = 5
+00208663 // BEQ  x1, x2, +12     | 5 == 5 -> TAKEN, skip the two wrong-path slots
+06f00413 // ADDI x8, x0, 111     | wrong-path write (flushed)
+06300193 // ADDI x3, x0, 99      | wrong-path (flushed)
+000404b3 // ADD  x9, x8, x0      | BEQ target: x9 = x8 -> must read 42, not 111

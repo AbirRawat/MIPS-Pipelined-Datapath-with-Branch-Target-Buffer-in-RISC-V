@@ -1,0 +1,30 @@
+// --- Setup ---
+00500093 // ADDI x1, x0, 5       | x1 = 5
+fff00513 // ADDI x10, x0, -1     | x10 = 0xFFFFFFFF (signed -1 / unsigned max)
+
+// --- BLT vs BLTU on (-1, 5): signed taken, unsigned not taken ---
+00154463 // BLT  x10, x1, +8     | signed -1 < 5  -> TAKEN, skip next
+06f00193 // ADDI x3, x0, 111     | flushed by BLT
+00400213 // ADDI x4, x0, 4       | BLT target
+00156463 // BLTU x10, x1, +8     | unsigned 0xFFFFFFFF < 5 = false -> NOT taken
+03700293 // ADDI x5, x0, 55      | executes (BLTU fell through)
+
+// --- BGE vs BGEU on (5, -1): signed taken, unsigned not taken ---
+00a0d463 // BGE  x1, x10, +8     | signed 5 >= -1 -> TAKEN, skip next
+0de00313 // ADDI x6, x0, 222     | flushed by BGE
+00700393 // ADDI x7, x0, 7       | BGE target
+00a0f463 // BGEU x1, x10, +8     | unsigned 5 >= 0xFFFFFFFF = false -> NOT taken
+05800413 // ADDI x8, x0, 88      | executes (BGEU fell through)
+
+// --- BEQ / BNE equality on (5, 5) and (5, -1): sign is irrelevant ---
+00108463 // BEQ  x1, x1, +8      | 5 == 5 -> TAKEN, skip next
+06f00613 // ADDI x12, x0, 111    | flushed by BEQ
+00d00693 // ADDI x13, x0, 13     | BEQ target
+00a08463 // BEQ  x1, x10, +8     | 5 == -1 = false -> NOT taken
+02c00713 // ADDI x14, x0, 44     | executes (BEQ fell through)
+00a09463 // BNE  x1, x10, +8     | 5 != -1 = true -> TAKEN, skip next
+0de00793 // ADDI x15, x0, 222    | flushed by BNE
+01000813 // ADDI x16, x0, 16     | BNE target
+00109463 // BNE  x1, x1, +8      | 5 != 5 = false -> NOT taken
+04200893 // ADDI x17, x0, 66     | executes (BNE fell through)
+00900493 // ADDI x9, x0, 9       | end marker

@@ -1,0 +1,32 @@
+// Three always-taken forward branches placed at PCs 0x0C, 0x2C and 0x4C.
+// All three share BTB set 3 (PC bits [4:2] = 011) but have different tags,
+// so the 2-way set is over-committed and the LRU policy must keep evicting.
+// An outer loop (back-edge at 0x5C, set 7, no conflict) runs the body 3 times.
+// The wrong-path ADDI +100 after each taken branch must never retire:
+// x6 = 3 iterations * 3 increments = 9 at the end.
+
+00300293 // 0x00: ADDI x5, x0, 3    | outer loop counter
+00000313 // 0x04: ADDI x6, x0, 0    | accumulator
+00000013 // 0x08: NOP               | padding (loop entry at 0x0C)
+00000463 // 0x0C: BEQ x0, x0, +8    | branch A (set 3, tag 0), always taken -> 0x14
+06430313 // 0x10: ADDI x6, x6, 100  | wrong path, must be flushed
+00130313 // 0x14: ADDI x6, x6, 1    | x6 += 1
+00000013 // 0x18: NOP               | padding to place branch B at 0x2C
+00000013 // 0x1C: NOP
+00000013 // 0x20: NOP
+00000013 // 0x24: NOP
+00000013 // 0x28: NOP
+00000463 // 0x2C: BEQ x0, x0, +8    | branch B (set 3, tag 1), always taken -> 0x34
+06430313 // 0x30: ADDI x6, x6, 100  | wrong path, must be flushed
+00130313 // 0x34: ADDI x6, x6, 1    | x6 += 1
+00000013 // 0x38: NOP               | padding to place branch C at 0x4C
+00000013 // 0x3C: NOP
+00000013 // 0x40: NOP
+00000013 // 0x44: NOP
+00000013 // 0x48: NOP
+00000463 // 0x4C: BEQ x0, x0, +8    | branch C (set 3, tag 2), always taken -> 0x54
+06430313 // 0x50: ADDI x6, x6, 100  | wrong path, must be flushed
+00130313 // 0x54: ADDI x6, x6, 1    | x6 += 1
+fff28293 // 0x58: ADDI x5, x5, -1   | outer counter -= 1
+fa0298e3 // 0x5C: BNE x5, x0, -80   | back-edge to 0x0C (set 7, tag 2)
+00030493 // 0x60: ADDI x9, x6, 0    | done: x9 = x6 (must be 9)
